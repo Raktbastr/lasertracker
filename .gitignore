@@ -1,0 +1,67 @@
+# Flutter/Dart build outputs
+/build/
+/.dart_tool/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+# .vscode/
+
+# macOS
+.DS_Store
+
+# Android
+/android/.gradle/
+/android/local.properties
+**/local.properties
+**/*.keystore
+**/gradle-wrapper.jar
+
+# iOS
+ios/Flutter/Generated.xcconfig
+ios/Flutter/Flutter.podspec
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.xcframework
+ios/ServiceDefinitions.json
+
+# Xcode
+*.xcworkspace
+*.xcuserstate
+DerivedData/
+*.xcuserdatad
+
+# Flutter generated
+**/doc/api/
+**/ios/Flutter/.last_build_id
+**/generated/
+
+# Other
+.pub-cache/
+.packages
+
+# Gradle
+.gradle/
+**/build/
+
+# User-specific files
+.idea/
+*.swp
+*.lock
+*.log
+
+# Flutter plugin deps
+.flutter-plugins
+.flutter-plugins-dependencies
