@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Spacer(),
               Image.asset(
-                "assets/logo.png",
+                "assets/tracker_logo-horizontal.png",
                 height: 75,
                 alignment: Alignment.center,
               ),

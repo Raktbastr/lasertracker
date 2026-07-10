@@ -1,4 +1,4 @@
-![Laser Tracker](https://raw.githubusercontent.com/Raktbastr/lasertracker/refs/heads/main/assets/logo.png)
+![Laser Tracker](https://raw.githubusercontent.com/Raktbastr/lasertracker/refs/heads/main/assets/tracker_logo-horizontal.png)
 
 # Laser Tracker
 A multiplatform application allowing FRC teams to track the statuses of thier members while at competitions. Developed by Team 2077 Laser Robotics.
