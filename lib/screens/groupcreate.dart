@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
-import 'homepage.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:async';
 
 class GroupCreatePage extends StatefulWidget {
@@ -44,7 +44,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
 
   void update() {
     if (debounce?.isActive ?? false) debounce!.cancel();
-    
+
     debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         teamNum = teamNumController.text;
@@ -215,11 +215,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                           pinController.text,
                         ) ==
                         true) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ),
-                      );
+                      context.go('/home');
                     }
                   } catch (e) {
                     scaffoldMessenger.showSnackBar(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
-import 'package:lasertracker/homepage.dart';
+import 'package:go_router/go_router.dart';
 
 class AccountCreatePage extends StatefulWidget {
   const AccountCreatePage({super.key});
@@ -98,11 +98,7 @@ class _AccountCreatePageState extends State<AccountCreatePage> {
                           groupKeyController.text,
                         ) ==
                         true) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ),
-                      );
+                      context.go('/home');
                     }
                   } catch (e) {
                     scaffoldMessenger.showSnackBar(

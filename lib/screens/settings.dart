@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lasertracker/main.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -30,7 +30,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> saveData() async {
     final prefs = await SharedPreferences.getInstance();
     if (backendURLController.text == "") {
-      await prefs.setString('backendURL', "https://api.lasertracker.laserrobotics.org");
+      await prefs.setString(
+        'backendURL',
+        "https://api.lasertracker.laserrobotics.org",
+      );
     } else {
       await prefs.setString('backendURL', backendURLController.text);
     }
@@ -70,46 +73,44 @@ class _SettingsPageState extends State<SettingsPage> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 16),
               ElevatedButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Reset All Data'),
-                    content: const Text('Are you sure you want to reset all data?'),
-                    actions: <Widget>[
-                      ElevatedButton(
-                        onPressed: () async {
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                          await prefs.clear();
-                          Navigator.pop(context);
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MyHomePage(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          textStyle: const TextStyle(color: Colors.white),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Logout and Reset Data'),
+                        content: const Text(
+                          'Are you sure you want to reset all data? This will log you out.',
                         ),
-                        child: const Text('Yes'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('No'),
-                      ),
-                    ]
+                        actions: <Widget>[
+                          ElevatedButton(
+                            onPressed: () async {
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.clear();
+                              context.go('/login');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              textStyle: const TextStyle(color: Colors.white),
+                            ),
+                            child: const Text('Yes'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('No'),
+                          ),
+                        ],
+                      );
+                    },
                   );
-                }
-              );
-            },
-            child: const Text('Reset All Data'),
-          ),
+                },
+                child: const Text('Reset All Data'),
+              ),
               Spacer(),
             ],
           ),
