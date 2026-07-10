@@ -1,3 +1,14 @@
+/*
+  Yes I know that this page is not formatted like the other widgets.
+  I would love for it to, really, but having it like this makes it play nice
+  on both the home and login screens, and there is no functional difference. 
+  I am also tired and believe that having a 2 same but different settings 
+  screens is stupid.
+  
+  This is also like my first **real** flutter project, there is without a
+  doubt a better way.
+*/
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -4,7 +4,7 @@ import 'package:lasertracker/screens/accountcreate.dart';
 import 'package:lasertracker/screens/groupcreate.dart';
 import 'package:lasertracker/screens/homepage.dart';
 import 'package:lasertracker/screens/loginpage.dart';
-import 'package:lasertracker/screens/settings.dart';
+import 'package:lasertracker/widgets/settingsview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
 
@@ -24,7 +24,7 @@ final GoRouter router = GoRouter(
         return '/home';
       }
     } else {
-      if (currentLocation == '/home' || currentLocation == '/settings') {
+      if (currentLocation == '/home') {
         return '/login';
       }
     }
