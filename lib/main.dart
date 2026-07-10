@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lasertracker/accountcreate.dart';
+import 'package:lasertracker/core/api.dart';
+import 'package:lasertracker/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'groupcreate.dart';
+import 'homepage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,18 +37,25 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController pinController = TextEditingController();
   bool isLoading = false;
 
-  Future<void> saveData() async {
-    final storage = FlutterSecureStorage();
-    await storage.write(key: "loginGroupCode", value: groupCodeController.text);
-    await storage.write(key: "loginUsername", value: usernameController.text);
-    await storage.write(key: "loginPin", value: pinController.text);
+  Future<void> loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    groupCodeController.text = prefs.getString("loginGroupKey") ?? '';
+    usernameController.text = prefs.getString("loginUsername") ?? '';
+    pinController.text = prefs.getString("loginPin") ?? '';
   }
 
-  Future<void> loadData() async {
-    final storage = FlutterSecureStorage();
-    groupCodeController.text = await storage.read(key: "loginGroupCode") ?? '';
-    usernameController.text = await storage.read(key: "loginUsername") ?? '';
-    pinController.text = await storage.read(key: "loginPin") ?? '';
+  @override
+  void dispose() {
+    groupCodeController.dispose();
+    usernameController.dispose();
+    pinController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
   }
 
   @override
@@ -92,7 +102,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: isLoading
                     ? null
                     : () async {
-                        final navigator = Navigator.of(context);
                         final scaffoldMessenger = ScaffoldMessenger.of(context);
 
                         setState(() {
@@ -100,11 +109,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
 
                         try {
-                          await saveData();
                           String groupCode = groupCodeController.text;
                           String username = usernameController.text;
                           String pin = pinController.text;
-                          // LOGIN LOGIC HERE
+                          if (await groupLogin(groupCode, username, pin) ==
+                              true) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const HomePage(),
+                              ),
+                            );
+                          }
                         } catch (e) {
                           scaffoldMessenger.showSnackBar(
                             SnackBar(
@@ -123,7 +138,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 16),
               TextButton(
-                child: const Text("or create a group"),
+                child: const Text("Create an account"),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AccountCreatePage(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                child: const Text("Create a group"),
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -133,6 +159,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
               Spacer(),
+              Row(
+                children: [
+                  Spacer(),
+                  FloatingActionButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsPage(),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.settings),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
