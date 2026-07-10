@@ -5,7 +5,7 @@ A multiplatform application allowing FRC teams to track the statuses of thier me
 ### AI was not used in the creation of this project as per the Laser Robotics bylaws.
 
 ## How does it work?
-A member of a team, creates a group along with thier username and password. That account is now the lead member of that group. This account is also given the group's 'join key'. It is suggested to have a mentor or coach use this account.
+A member of a team creates a group along with thier username and password. That account is now the lead member of that group. This account is also given the group's 'join key'. It is suggested to have a mentor or coach use this account.
 
 When a group is created, it is associated with a team and event, so new groups are required for each event a team participates in. This allows the app to show stats specific to your team, such as upcoming matches.
 
