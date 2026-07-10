@@ -43,7 +43,7 @@ class _AccountCreatePageState extends State<AccountCreatePage> {
                 ),
               ),
               Text(
-                "This is the group key given to you by your mentor/coach/",
+                "This is the group key given to you by your mentor/coach",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               SizedBox(height: 16),
