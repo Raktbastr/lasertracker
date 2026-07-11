@@ -2,7 +2,7 @@
 
 # Laser Tracker
 A multiplatform application allowing FRC teams to track the statuses of thier members while at competitions. Developed by Team 2077 Laser Robotics.
-### AI was not used in the creation of this project as per the Laser Robotics bylaws.
+### AI was not used to generate code in this project as per the Laser Robotics bylaws.
 
 ## How does it work?
 A member of a team creates a group along with thier username and password. That account is now the lead member of that group. This account is also given the group's 'join key'. It is suggested to have a mentor or coach use this account.
