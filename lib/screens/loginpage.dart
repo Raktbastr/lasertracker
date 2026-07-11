@@ -124,8 +124,8 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Spacer(),
                   FloatingActionButton(
-                    onPressed: () => context.push('/settings'),
-                    child: const Icon(Icons.settings),
+                    onPressed: () => context.push('/url-change'),
+                    child: const Icon(Icons.link),
                   ),
                 ],
               ),

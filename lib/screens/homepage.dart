@@ -17,15 +17,13 @@ class _HomePageState extends State<HomePage> {
     TeamView(),
     GroupChatView(),
     MembersView(),
-    SettingsPage(),
+    SettingsView(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: pages[pageIndex],
-      ),
+      body: SafeArea(child: pages[pageIndex]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: pageIndex,
         onDestinationSelected: (int index) {
@@ -34,12 +32,12 @@ class _HomePageState extends State<HomePage> {
           });
         },
         destinations: const <Widget>[
-          NavigationDestination(icon: Icon(Icons.home), label: "Team"),
-          NavigationDestination(icon: Icon(Icons.chat), label: "Group Chat"),
-          NavigationDestination(icon: Icon(Icons.people_alt_rounded), label: "Members"),
-          NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
+          NavigationDestination(icon: Icon(Icons.home, color: Color(0xff01ff92)), label: "Team"),
+          NavigationDestination(icon: Icon(Icons.chat, color: Color(0xff01ff92)), label: "Chat"),
+          NavigationDestination(icon: Icon(Icons.radar, color: Color(0xff01ff92)), label: "Members"),
+          NavigationDestination(icon: Icon(Icons.settings, color: Color(0xff01ff92)), label: "Settings"),
         ],
-        indicatorColor: Color(0xFFfcd804),
+        indicatorColor: Color.fromARGB(48, 116, 249, 156),
       ),
     );
   }

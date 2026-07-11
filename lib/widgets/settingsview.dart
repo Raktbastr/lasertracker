@@ -1,89 +1,46 @@
-/*
-  Yes I know that this page is not formatted like the other widgets.
-  I would love for it to, really, but having it like this makes it play nice
-  on both the home and login screens, and there is no functional difference. 
-  I am also tired and believe that having a 2 same but different settings 
-  screens is stupid.
-  
-  This is also like my first **real** flutter project, there is without a
-  doubt a better way.
-*/
+// Alas, the best option for now was to have 2 pages.
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class SettingsView extends StatefulWidget {
+  const SettingsView({super.key});
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsView> createState() => _SettingsViewState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  final TextEditingController backendURLController = TextEditingController();
+class _SettingsViewState extends State<SettingsView> {
+  String joinKey = "";
+
+  Future<void> loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    joinKey = prefs.getString("join_key") ?? "hi";
+    setState(() {
+      joinKey;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     loadData();
-    backendURLController.addListener(() {
-      saveData();
-    });
-  }
-
-  @override
-  void dispose() {
-    backendURLController.removeListener(() {});
-    backendURLController.dispose();
-    super.dispose();
-  }
-
-  Future<void> saveData() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (backendURLController.text == "") {
-      await prefs.setString(
-        'backendURL',
-        "https://api.lasertracker.laserrobotics.org",
-      );
-    } else {
-      await prefs.setString('backendURL', backendURLController.text);
-    }
-  }
-
-  Future<void> loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final value = prefs.getString('backendURL') ?? '';
-    setState(() {
-      backendURLController.text = value;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings")),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
+      body: ListView(
+        padding: EdgeInsets.all(16),
+        children: [
+          Column(
             children: [
               Text(
-                "Laser Tracker Server URL",
+                "Group Join Key",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              Text(
-                "Set the URL of the Laser Tracker Server instance. Leave it blank to use the default.",
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
               const SizedBox(height: 16),
-              TextField(
-                controller: backendURLController,
-                decoration: InputDecoration(
-                  labelText: "https://api.lasertracker.laserrobotics.org",
-                  border: OutlineInputBorder(),
-                ),
-              ),
+              Text(joinKey, style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
@@ -91,16 +48,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('Logout and Reset Data'),
+                        title: const Text('Log out'),
                         content: const Text(
-                          'Are you sure you want to reset all data? This will log you out.',
+                          'Are you sure you want to log out.',
                         ),
                         actions: <Widget>[
                           ElevatedButton(
                             onPressed: () async {
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
+                              String url = prefs.getString("backendURL")!;
                               await prefs.clear();
+                              prefs.setString("backendURL", url);
                               context.go('/login');
                             },
                             style: ElevatedButton.styleFrom(
@@ -120,12 +79,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   );
                 },
-                child: const Text('Reset All Data'),
+                child: const Text('Log out'),
               ),
-              Spacer(),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

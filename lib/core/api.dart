@@ -67,7 +67,7 @@ Future<bool> memberAdd(String username, String displayName, String pin, String g
   }
 }
 
-Future<bool> groupCreate(String groupName, String eventKey, int teamNum, String username, String displayName, String pin) async {
+Future<bool> groupCreate(String groupName, String eventKey, String teamNum, String username, String displayName, String pin) async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
 
@@ -117,7 +117,7 @@ Future<Image> getTeamAvatar(String teamNum) async {
       }
     }
   }
-  return Image.asset("assets/first_icon.png"); // Make sure this asset exists
+  return Image.asset("assets/first_icon.png");
 }
 
 Future<List<dynamic>> getEvents(String teamNum) async {
@@ -142,4 +142,20 @@ Future<List<dynamic>> getMatches(String teamNum, String eventKey) async {
   } else {
     throw Exception("Failed to load matches");
   }
+}
+
+Future<bool> setLocation(String location) async {
+  return true;
+}
+
+Future<bool> setJob(String location) async {
+  return true;
+}
+
+Future<bool> setRole(String location) async {
+  return true;
+}
+
+Future<bool> isLead() async {
+  return true;
 }

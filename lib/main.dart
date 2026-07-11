@@ -4,6 +4,7 @@ import 'package:lasertracker/screens/accountcreate.dart';
 import 'package:lasertracker/screens/groupcreate.dart';
 import 'package:lasertracker/screens/homepage.dart';
 import 'package:lasertracker/screens/loginpage.dart';
+import 'package:lasertracker/screens/urlpage.dart';
 import 'package:lasertracker/widgets/settingsview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
@@ -20,7 +21,7 @@ final GoRouter router = GoRouter(
     if (isLoggedIn) {
       if (currentLocation == '/login' ||
           currentLocation == '/account-create' ||
-          currentLocation == '/group-create') {
+          currentLocation == '/group-create' || currentLocation == '/url-change') {
         return '/home';
       }
     } else {
@@ -35,9 +36,10 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
     GoRoute(
-      path: '/settings',
-      builder: (context, state) => const SettingsPage(),
+      path: "/settings",
+      builder: (context, state) => const SettingsView(),
     ),
+    GoRoute(path: '/url-change', builder: (context, state) => const URLPage()),
     GoRoute(
       path: '/account-create',
       builder: (context, state) => const AccountCreatePage(),

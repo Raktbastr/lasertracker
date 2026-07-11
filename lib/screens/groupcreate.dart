@@ -209,7 +209,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                     if (await groupCreate(
                           teamName,
                           eventCode,
-                          int.parse(teamNum),
+                          teamNum,
                           usernameController.text,
                           displaynameController.text,
                           pinController.text,
