@@ -170,7 +170,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               ),
               Text(
                 "This is the name that will be displayed to other members in the group.",
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               SizedBox(height: 16),
               TextField(
@@ -182,7 +182,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               ),
               Text(
                 "This is the name that will be used to log in to the group.",
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               SizedBox(height: 16),
               TextField(
@@ -194,7 +194,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               ),
               Text(
                 "This is the password that will be used to log in to the group.",
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               SizedBox(height: 16),
               ElevatedButton(

@@ -11,13 +11,13 @@ class MembersView extends StatefulWidget {
 
 class _MembersViewState extends State<MembersView> {
   List<String> locations = [
-    "In cafeteria",
-    "In stands",
-    "In pits",
-    "In Impact Award room",
-    "In Leadership Award room",
-    "In Woodie Flowers Award room",
-    "In Queuing/Field",
+    "Cafeteria",
+    "Stands",
+    "Pits",
+    "Impact Award room",
+    "Leadership Award room",
+    "Woodie Flowers Award room",
+    "Queuing/Field",
     "At Home",
     "Custom",
   ];
@@ -28,19 +28,25 @@ class _MembersViewState extends State<MembersView> {
     "Drive Team - Driver",
     "Drive Team - Tech Driver",
     "Drive Team - Technician",
-    "Impact Award presenter",
+    "Impact Award Presenter",
     "Student Ambassador",
     "Custom",
   ];
 
-  List<String> roles = ["student", "Mentor", "Lead Coach 1", "Lead Coach 2"];
+  List<String> roles = ["Student", "Mentor", "Lead Coach 1", "Lead Coach 2"];
 
   String currLoc = "";
   String currJob = "";
   String currRole = "";
+  String loggedInUsername = "";
+  bool userIsAdmin = false;
 
   final TextEditingController locationController = TextEditingController();
   final TextEditingController jobController = TextEditingController();
+  final TextEditingController customJobController = TextEditingController();
+  final TextEditingController customLocationController =
+      TextEditingController();
+  final TextEditingController newPinController = TextEditingController();
 
   List<DropdownMenuEntry> listToEntries(List list) {
     List<DropdownMenuEntry> entries = [];
@@ -53,18 +59,106 @@ class _MembersViewState extends State<MembersView> {
 
   void loadData() async {
     final prefs = await SharedPreferences.getInstance();
+    userIsAdmin = await isAdmin();
 
     setState(() {
-      currLoc = prefs.getString("job")!;
-      currJob = prefs.getString("location")!;
-      currRole = prefs.getString("role")!;
+      currLoc = prefs.getString("location") ?? "";
+      currJob = prefs.getString("job") ?? "";
+      currRole = prefs.getString("role") ?? "";
+      loggedInUsername = prefs.getString("loginUsername") ?? "";
+      locationController.text = currLoc;
+      jobController.text = currJob;
+      userIsAdmin = userIsAdmin;
     });
   }
 
   @override
   void initState() {
-    loadData();
     super.initState();
+    loadData();
+  }
+
+  void showEditDialog(
+    BuildContext context,
+    String targetUsername,
+    String role,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController roleController = TextEditingController(
+          text: role,
+        );
+        return AlertDialog(
+          title: const Text("Edit Member"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownMenu(
+                  expandedInsets: EdgeInsets.zero,
+                  controller: roleController,
+                  label: Text(
+                    "Role",
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  inputDecorationTheme: const InputDecorationTheme(
+                    border: OutlineInputBorder(),
+                  ),
+                  initialSelection: role,
+                  enabled: userIsAdmin & (targetUsername != loggedInUsername),
+                  dropdownMenuEntries: listToEntries(roles),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: newPinController,
+                  decoration: const InputDecoration(
+                    labelText: "New Pin",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  if (newPinController.text != "") {
+                    await changePin(targetUsername, newPinController.text);
+                    newPinController.text = "";
+                  }
+                  // setStatus
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text("Member updated successfully!"),
+                    ),
+                  );
+                  Navigator.pop(context);
+                } catch (e) {
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text("Error: ${e.toString()}"),
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.all(16),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                newPinController.text = "";
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -75,84 +169,340 @@ class _MembersViewState extends State<MembersView> {
       children: [
         Column(
           children: [
-            Text("You"),
-            Row(
+            const SizedBox(height: 16),
+            Text(
+              "Your Status",
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 5),
+            Column(
               children: [
-                Expanded(
-                  child: DropdownMenu(
-                    controller: locationController,
-                    expandedInsets: EdgeInsets.zero,
-                    inputDecorationTheme: InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
-                    onSelected: (value) {
-                      try {
-                        setJob(value.toString());
-                      } catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text("Error: ${e.toString()}"),
-                            behavior: SnackBarBehavior.floating,
-                            margin: const EdgeInsets.all(16),
-                          ),
-                        );
-                      }
-                    },
-                    initialSelection: currLoc,
-                    dropdownMenuEntries: listToEntries(locations),
+                DropdownMenu(
+                  controller: locationController,
+                  expandedInsets: EdgeInsets.zero,
+                  label: const Text("Location"),
+                  inputDecorationTheme: const InputDecorationTheme(
+                    border: OutlineInputBorder(),
                   ),
+                  onSelected: (value) async {
+                    try {
+                      if (value == "Custom") {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Custom Location"),
+                              content: TextField(
+                                controller: customLocationController,
+                                decoration: const InputDecoration(
+                                  labelText: "Location",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    try {
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      await prefs.setString(
+                                        "location",
+                                        customLocationController.text,
+                                      );
+                                      await setStatus();
+                                      locationController.text =
+                                          customLocationController.text;
+                                      if (mounted) Navigator.pop(context);
+                                    } catch (e) {
+                                      scaffoldMessenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Error: ${e.toString()}",
+                                          ),
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: const EdgeInsets.all(16),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Set Location'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    locationController.text = currLoc;
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString("location", value.toString());
+                        await setStatus();
+                      }
+                    } catch (e) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text("Error: ${e.toString()}"),
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(16),
+                        ),
+                      );
+                    }
+                  },
+                  initialSelection: currLoc,
+                  dropdownMenuEntries: listToEntries(locations),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: DropdownMenu(
-                    controller: jobController,
-                    expandedInsets: EdgeInsets.zero,
-                    inputDecorationTheme: InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
-                    onSelected: (value) {
-                      try {
-                        setJob(value.toString());
-                      } catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text("Error: ${e.toString()}"),
-                            behavior: SnackBarBehavior.floating,
-                            margin: const EdgeInsets.all(16),
-                          ),
-                        );
-                      }
-                    },
-                    initialSelection: currJob,
-                    dropdownMenuEntries: listToEntries(jobs),
+                const SizedBox(height: 16),
+                DropdownMenu(
+                  controller: jobController,
+                  expandedInsets: EdgeInsets.zero,
+                  label: const Text("Job"),
+                  inputDecorationTheme: const InputDecorationTheme(
+                    border: OutlineInputBorder(),
                   ),
+                  onSelected: (value) async {
+                    try {
+                      if (value == "Custom") {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Custom Job"),
+                              content: TextField(
+                                controller: customJobController,
+                                decoration: const InputDecoration(
+                                  labelText: "Job Title",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    try {
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      await prefs.setString(
+                                        "job",
+                                        customJobController.text,
+                                      );
+                                      await setStatus();
+                                      jobController.text =
+                                          customJobController.text;
+                                      if (mounted) Navigator.pop(context);
+                                    } catch (e) {
+                                      scaffoldMessenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Error: ${e.toString()}",
+                                          ),
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: const EdgeInsets.all(16),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Set Job'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    jobController.text = currJob;
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString("job", value.toString());
+                        await setStatus();
+                      }
+                    } catch (e) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text("Error: ${e.toString()}"),
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(16),
+                        ),
+                      );
+                    }
+                  },
+                  initialSelection: currJob,
+                  dropdownMenuEntries: listToEntries(jobs),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: DropdownMenu(
-                    expandedInsets: EdgeInsets.zero,
-                    inputDecorationTheme: InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
-                    onSelected: (value) {
-                      try {
-                        setJob(value.toString());
-                      } catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text("Error: ${e.toString()}"),
-                            behavior: SnackBarBehavior.floating,
-                            margin: const EdgeInsets.all(16),
-                          ),
-                        );
-                      }
-                    },
-                    enabled: false,
-                    initialSelection: currRole,
-                    dropdownMenuEntries: listToEntries([currRole]),
+                const SizedBox(height: 16),
+                DropdownMenu(
+                  expandedInsets: EdgeInsets.zero,
+                  label: const Text("Role"),
+                  inputDecorationTheme: const InputDecorationTheme(
+                    border: OutlineInputBorder(),
                   ),
+                  enabled: false,
+                  initialSelection: currRole,
+                  dropdownMenuEntries: listToEntries([currRole]),
                 ),
               ],
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const SizedBox(height: 16),
+            Text(
+              "Team Members",
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 5),
+            FutureBuilder(
+              future: Future.wait([getMembers(), isAdmin()]),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  final results = snapshot.data as List<dynamic>;
+                  final List members = results[0] as List;
+                  final bool admin = results[1] as bool;
+
+                  final Map<String, List> groups = {};
+                  for (var m in members) {
+                    final loc = (m["location"] ?? "Unknown") as String;
+                    if (m["username"] == loggedInUsername) {
+                      if (members.length - 1 == 0) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text("No Members"),
+                          ),
+                        );
+                      }
+                      continue;
+                    } else {
+                      groups.putIfAbsent(loc, () => []).add(m);
+                    }
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: groups.entries.map((entry) {
+                      final loc = entry.key;
+                      final list = entry.value;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 10),
+                          Text(
+                            loc,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "Name",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Role",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Job",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                              const SizedBox(width: 48),
+                            ],
+                          ),
+                          ...list.map<Widget>((member) {
+                            final name = member["display_name"] ?? "";
+                            final role = member["role"] ?? "";
+                            final job = member["job"] ?? "";
+                            final username = member["username"] ?? "";
+
+                            final bool canEditUser = admin;
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: Column(
+                                children: [
+                                  const Divider(),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleSmall,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          role,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleSmall,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          job,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleSmall,
+                                        ),
+                                      ),
+                                      canEditUser
+                                          ? IconButton.filled(
+                                              onPressed: () => showEditDialog(
+                                                context,
+                                                username,
+                                                role,
+                                                scaffoldMessenger,
+                                              ),
+                                              icon: const Icon(Icons.pin),
+                                            )
+                                          : const SizedBox(width: 48),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      );
+                    }).toList(),
+                  );
+                }
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),

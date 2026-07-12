@@ -5,7 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _saveSessionData(Map<String, dynamic> data, String pin) async {
   final prefs = await SharedPreferences.getInstance();
-  
+
+  if (data["id"] != null) {
+    await prefs.setInt("member_id", data["id"] as int);
+  }
+
   await prefs.setString("loginGroupKey", data["join_key"] ?? "");
   await prefs.setString("loginUsername", data["username"] ?? "");
   await prefs.setString("loginPin", pin);
@@ -26,7 +30,7 @@ Future<void> _saveSessionData(Map<String, dynamic> data, String pin) async {
 
 Future<bool> groupLogin(String groupKey, String username, String pin) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
+  final serverURL = prefs.getString("backendURL");
 
   final response = await http.post(
     Uri.parse("$serverURL/login"),
@@ -39,13 +43,18 @@ Future<bool> groupLogin(String groupKey, String username, String pin) async {
     await _saveSessionData(data, pin);
     return true;
   } else {
-    throw Exception(jsonDecode(response.body)["error"] ?? "Failed to login");
+    throw Exception("Failed to login: ${response.statusCode}");
   }
 }
 
-Future<bool> memberAdd(String username, String displayName, String pin, String groupKey) async {
+Future<bool> memberAdd(
+  String username,
+  String displayName,
+  String pin,
+  String groupKey,
+) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
+  final serverURL = prefs.getString("backendURL");
 
   final response = await http.post(
     Uri.parse("$serverURL/groups/join"),
@@ -54,7 +63,7 @@ Future<bool> memberAdd(String username, String displayName, String pin, String g
       "join_key": groupKey,
       "username": username,
       "display_name": displayName,
-      "pin": pin
+      "pin": pin,
     }),
   );
 
@@ -63,13 +72,20 @@ Future<bool> memberAdd(String username, String displayName, String pin, String g
     await _saveSessionData(data, pin);
     return true;
   } else {
-    throw Exception(jsonDecode(response.body)["error"] ?? "Failed to join group");
+    throw Exception("Failed to join group: ${response.statusCode}");
   }
 }
 
-Future<bool> groupCreate(String groupName, String eventKey, String teamNum, String username, String displayName, String pin) async {
+Future<bool> groupCreate(
+  String groupName,
+  String eventKey,
+  String teamNum,
+  String username,
+  String displayName,
+  String pin,
+) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
+  final serverURL = prefs.getString("backendURL");
 
   final response = await http.post(
     Uri.parse("$serverURL/groups"),
@@ -80,7 +96,7 @@ Future<bool> groupCreate(String groupName, String eventKey, String teamNum, Stri
       "team_number": teamNum,
       "leader_username": username,
       "leader_display_name": displayName,
-      "leader_pin": pin
+      "leader_pin": pin,
     }),
   );
 
@@ -89,15 +105,17 @@ Future<bool> groupCreate(String groupName, String eventKey, String teamNum, Stri
     await _saveSessionData(data, pin);
     return true;
   } else {
-    throw Exception(jsonDecode(response.body)["error"] ?? "Failed to create group");
+    throw Exception("Failed to create group: ${response.statusCode}");
   }
 }
 
 Future<String> getTeamName(String teamNum) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
-  
-  final response = await http.get(Uri.parse("$serverURL/tba/teaminfo/$teamNum"));
+  final serverURL = prefs.getString("backendURL");
+
+  final response = await http.get(
+    Uri.parse("$serverURL/tba/teaminfo/$teamNum"),
+  );
   if (response.statusCode == 200) {
     return jsonDecode(response.body)["nickname"];
   }
@@ -106,7 +124,7 @@ Future<String> getTeamName(String teamNum) async {
 
 Future<Image> getTeamAvatar(String teamNum) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
+  final serverURL = prefs.getString("backendURL");
 
   final response = await http.get(Uri.parse("$serverURL/tba/avatar/$teamNum"));
   if (response.statusCode == 200) {
@@ -122,7 +140,7 @@ Future<Image> getTeamAvatar(String teamNum) async {
 
 Future<List<dynamic>> getEvents(String teamNum) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
+  final serverURL = prefs.getString("backendURL");
 
   final response = await http.get(Uri.parse("$serverURL/tba/$teamNum/events"));
   if (response.statusCode == 200) {
@@ -134,28 +152,110 @@ Future<List<dynamic>> getEvents(String teamNum) async {
 
 Future<List<dynamic>> getMatches(String teamNum, String eventKey) async {
   final prefs = await SharedPreferences.getInstance();
-  final serverURL = prefs.getString("backendURL") ?? "https://api.lasertracker.laserrobotics.org";
-  
-  final response = await http.get(Uri.parse("$serverURL/tba/matches/$eventKey/$teamNum"));
+  final serverURL = prefs.getString("backendURL");
+
+  final response = await http.get(
+    Uri.parse("$serverURL/tba/matches/$eventKey/$teamNum"),
+  );
   if (response.statusCode == 200) {
     return jsonDecode(response.body) as List<dynamic>;
   } else {
-    throw Exception("Failed to load matches");
+    throw Exception("Failed to load matches: ${response.statusCode}");
   }
 }
 
-Future<bool> setLocation(String location) async {
-  return true;
+Future<bool> isAdmin() async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("loginGroupKey");
+  final username = prefs.getString("loginUsername");
+
+  final response = await http.get(
+    Uri.parse("$serverURL/groups/$groupKey/admin-check"),
+    headers: {"X-Username": username ?? ""}
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body)["is_admin"] ?? false;
+  }
+  return false;
 }
 
-Future<bool> setJob(String location) async {
-  return true;
+Future<List<dynamic>> getMembers() async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final joinKey = prefs.getString("loginGroupKey");
+  final username = prefs.getString("loginUsername");
+  final pin = prefs.getString("loginPin");
+
+  final response = await http.get(
+    Uri.parse("$serverURL/groups/$joinKey/members"),
+    headers: {"X-Username": username ?? "", "X-Pin": pin ?? ""},
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as List<dynamic>;
+  } else {
+    throw Exception("Failed to fetch members: ${response.statusCode}");
+  }
 }
 
-Future<bool> setRole(String location) async {
-  return true;
+Future<bool> setStatus() async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("join_key");
+  final username = prefs.getString("loginUsername");
+  final pin = prefs.getString("loginPin");
+  final location = prefs.getString("location");
+  final job = prefs.getString("job");
+
+  final response = await http.put(
+    Uri.parse("$serverURL/groups/$groupKey/members/status"),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Username": username ?? "",
+      "X-Pin": pin ?? "",
+    },
+    body: jsonEncode({"location": location, "job": job}),
+  );
+
+  if (response.statusCode == 200) {
+    prefs.setString("job", job ?? "");
+    prefs.setString("location", location ?? "");
+    return true;
+  } else {
+    throw Exception("Failed to update status: ${response.statusCode}");
+  }
 }
 
-Future<bool> isLead() async {
-  return true;
+Future<bool> changePin(String targetUsername, String newPin) async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("loginGroupKey");
+  final currentUsername = prefs.getString("loginUsername");
+
+  bool isSelf = currentUsername?.toLowerCase() == targetUsername.toLowerCase();
+  bool adminStatus = await isAdmin();
+
+  if (!isSelf && !adminStatus) {
+    throw Exception("Unauthorized: You can only change your own pin unless you are an admin.");
+  }
+
+  final response = await http.put(
+    Uri.parse("$serverURL/groups/$groupKey/members/$targetUsername/reset-pin"),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Username": currentUsername ?? "",
+    },
+    body: jsonEncode({"new_pin": newPin}),
+  );
+
+  if (response.statusCode == 200) {
+    if (isSelf) {
+      await prefs.setString("loginPin", newPin);
+    }
+    return true;
+  } else {
+    throw Exception("Failed to reset pin: ${response.statusCode}");
+  }
 }

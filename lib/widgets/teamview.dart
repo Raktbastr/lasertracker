@@ -13,6 +13,7 @@ class _TeamViewState extends State<TeamView> {
   String teamNum = "";
   String groupName = "";
   String eventKey = "";
+  String joinKey = "";
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _TeamViewState extends State<TeamView> {
       teamNum = prefs.getString("team_number") ?? "";
       groupName = prefs.getString("group_name") ?? "";
       eventKey = prefs.getString("event_key") ?? "";
+      joinKey = prefs.getString("join_key") ?? "";
     });
   }
 
@@ -39,6 +41,7 @@ class _TeamViewState extends State<TeamView> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       children: [
+        SizedBox(height: 16),
         Row(
           children: [
             SizedBox(
@@ -66,6 +69,13 @@ class _TeamViewState extends State<TeamView> {
                 Text("Team $teamNum"),
               ],
             ),
+            Spacer(),
+            Column(
+              children: [
+                Text("Join Key", style: Theme.of(context).textTheme.titleLarge),
+                Text(joinKey)
+              ],
+            )
           ],
         ),
         const SizedBox(height: 24),
@@ -332,9 +342,9 @@ class _TeamViewState extends State<TeamView> {
                       var upcomingMatch = matches[index + 1];
                       return Column(
                         children: [
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           Divider(),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Row(

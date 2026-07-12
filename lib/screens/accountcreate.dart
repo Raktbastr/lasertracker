@@ -82,6 +82,7 @@ class _AccountCreatePageState extends State<AccountCreatePage> {
                 "This is the password you will use to log in to the group",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
+              SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
