@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 final ThemeData laserTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color(0xff01ff92),
-    primary: const Color(0xff01ff92),
+    seedColor: const Color(0xff00ff92),
+    primary: const Color(0xff00ff92),
     brightness: Brightness.dark,
   ),
 
@@ -75,7 +75,7 @@ final ThemeData laserTheme = ThemeData(
 
   inputDecorationTheme: const InputDecorationTheme(
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: Color(0xff01ff92), width: 2.0),
+      borderSide: BorderSide(color: Color(0xff00ff92), width: 2.0),
     ),
     floatingLabelStyle: TextStyle(color: Colors.white),
     hintStyle: TextStyle(color: Colors.white54),
