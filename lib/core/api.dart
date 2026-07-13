@@ -22,7 +22,6 @@ Future<void> _saveSessionData(Map<String, dynamic> data, String pin) async {
   await prefs.setString("member_id", data["id"].toString());
   await prefs.setString("username", data["username"] ?? "");
   await prefs.setString("display_name", data["display_name"] ?? "");
-  await prefs.setString("status", data["status"] ?? "");
   await prefs.setString("job", data["job"] ?? "");
   await prefs.setString("role", data["role"] ?? "");
   await prefs.setString("location", data["location"] ?? "");
@@ -169,10 +168,13 @@ Future<bool> isAdmin() async {
   final serverURL = prefs.getString("backendURL");
   final groupKey = prefs.getString("loginGroupKey");
   final username = prefs.getString("loginUsername");
-
+  final pin = prefs.getString("loginPin");
   final response = await http.get(
     Uri.parse("$serverURL/groups/$groupKey/admin-check"),
-    headers: {"X-Username": username ?? ""}
+    headers: {
+      "X-Username": username ?? "",
+      "X-Pin": pin ?? "",
+    }
   );
 
   if (response.statusCode == 200) {
@@ -233,9 +235,10 @@ Future<bool> changePin(String targetUsername, String newPin) async {
   final serverURL = prefs.getString("backendURL");
   final groupKey = prefs.getString("loginGroupKey");
   final currentUsername = prefs.getString("loginUsername");
+  final currentPin = prefs.getString("loginPin");
 
   bool isSelf = currentUsername?.toLowerCase() == targetUsername.toLowerCase();
-  bool adminStatus = await isAdmin();
+  bool adminStatus = await isAdmin(); 
 
   if (!isSelf && !adminStatus) {
     throw Exception("Unauthorized: You can only change your own pin unless you are an admin.");
@@ -246,6 +249,7 @@ Future<bool> changePin(String targetUsername, String newPin) async {
     headers: {
       "Content-Type": "application/json",
       "X-Username": currentUsername ?? "",
+      "X-Pin": currentPin ?? "",
     },
     body: jsonEncode({"new_pin": newPin}),
   );
@@ -257,5 +261,103 @@ Future<bool> changePin(String targetUsername, String newPin) async {
     return true;
   } else {
     throw Exception("Failed to reset pin: ${response.statusCode}");
+  }
+}
+
+Future<bool> changeRole(String targetUsername, String newRole) async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("join_key");
+  final currentUsername = prefs.getString("loginUsername");
+  final currentPin = prefs.getString("loginPin"); 
+
+  bool adminStatus = await isAdmin();
+
+  if (!adminStatus) {
+    throw Exception("Unauthorized: You can only change roles as an admin.");
+  }
+
+  final response = await http.put(
+    Uri.parse("$serverURL/groups/$groupKey/members/role"),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Username": currentUsername ?? "",
+      "X-Pin": currentPin ?? "",
+      "X-Target": targetUsername,
+    },
+    body: jsonEncode({"new_role": newRole}),
+  );
+
+  if (response.statusCode == 200) {
+    bool isSelf = currentUsername?.toLowerCase() == targetUsername.toLowerCase();
+    if (isSelf) {
+      await prefs.setString("role", newRole);
+    }
+    return true;
+  } else {
+    throw Exception("Failed to change role: ${response.statusCode}");
+  }
+}
+
+Future<bool> updateGroup(String groupName, String eventKey) async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("loginGroupKey");
+  final currentUsername = prefs.getString("loginUsername");
+  final currentPin = prefs.getString("loginPin");
+
+  final response = await http.put(
+    Uri.parse("$serverURL/groups/$groupKey"),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Username": currentUsername ?? "",
+      "X-Pin": currentPin ?? "",
+    },
+    body: jsonEncode({
+      "group_name": groupName,
+      "event_key": eventKey,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    await prefs.setString("group_name", groupName);
+    await prefs.setString("event_key", eventKey);
+    return true;
+  } else {
+    throw Exception("Failed to update group: ${response.statusCode}");
+  }
+}
+
+Future<bool> changeAdmin(String targetUsername, bool status) async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("loginGroupKey");
+  final currentUsername = prefs.getString("loginUsername");
+  final currentPin = prefs.getString("loginPin");
+  int admin;
+
+  if (status) {
+    admin = 1;
+  } else {
+    admin = 0;
+  }
+
+  final response = await http.put(
+    Uri.parse("$serverURL/groups/$groupKey/members/change-admin"),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Username": currentUsername ?? "",
+      "X-Pin": currentPin ?? "",
+      "X-Target": targetUsername,
+    },
+    body: jsonEncode({
+      "is_admin": admin,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    throw Exception("Failed to update admin status: ${response.statusCode}");
   }
 }
