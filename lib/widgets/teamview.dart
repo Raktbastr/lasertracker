@@ -13,7 +13,7 @@ class _TeamViewState extends State<TeamView> {
   String teamNum = "";
   String groupName = "";
   String eventKey = "";
-  String joinKey = "";
+  String groupKey = "";
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _TeamViewState extends State<TeamView> {
       teamNum = prefs.getString("team_number") ?? "";
       groupName = prefs.getString("group_name") ?? "";
       eventKey = prefs.getString("event_key") ?? "";
-      joinKey = prefs.getString("join_key") ?? "";
+      groupKey = prefs.getString("loginGroupKey") ?? "";
     });
   }
 
@@ -86,7 +86,7 @@ class _TeamViewState extends State<TeamView> {
                     "Join Key",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  Text(joinKey),
+                  Text(groupKey),
                 ],
               ),
             ],

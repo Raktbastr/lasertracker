@@ -10,21 +10,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController groupCodeController = TextEditingController();
+  final TextEditingController groupKeyController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController pinController = TextEditingController();
   bool isLoading = false;
 
   Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
-    groupCodeController.text = prefs.getString("loginGroupKey") ?? '';
+    groupKeyController.text = prefs.getString("loginGroupKey") ?? '';
     usernameController.text = prefs.getString("loginUsername") ?? '';
     pinController.text = prefs.getString("loginPin") ?? '';
   }
 
   @override
   void dispose() {
-    groupCodeController.dispose();
+    groupKeyController.dispose();
     usernameController.dispose();
     pinController.dispose();
     super.dispose();
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: groupCodeController,
+                controller: groupKeyController,
                 decoration: const InputDecoration(
                   labelText: 'Group Code',
                   border: OutlineInputBorder(),
@@ -87,10 +87,10 @@ class _LoginPageState extends State<LoginPage> {
                         });
 
                         try {
-                          String groupCode = groupCodeController.text;
+                          String groupKey = groupKeyController.text;
                           String username = usernameController.text;
                           String pin = pinController.text;
-                          if (await groupLogin(groupCode, username, pin) == true) {
+                          if (await groupLogin(groupKey, username, pin) == true) {
                             context.go('/home');
                           }
                         } catch (e) {

@@ -1,21 +1,9 @@
 ### Major Features
-- Status changing
-- Pin resets
-- Multiple lead members
-- Group chats
-- Timestamp-based refreshing of info
-- Add member view
-- Logging of events per group
+- Battery checking
 ### Minor Features / Quality of Life
 - dispose() functions where needed
-- Remove status (the member variable, not, yknow, statuses)
-- Event live stream frame in team view
-- Drive team lineup in team view
-- Better solution for settings
-- Server connection status in settings
+- Responsive views
 - Join via qr code
 - License
 - About section
-- Testing server with in-progress event info
 - Custom events (For events not on TBA)
-- Timestamp confirmation of status + reconfirmation (Allows people to see when you last updated your status and lets you to keep it updated)

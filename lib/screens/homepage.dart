@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lasertracker/widgets/groupchatview.dart';
+import 'package:lasertracker/widgets/logview.dart';
 import 'package:lasertracker/widgets/membersview.dart';
 import 'package:lasertracker/widgets/settingsview.dart';
 import 'package:lasertracker/widgets/teamview.dart';
@@ -15,8 +15,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> pages = const [
     TeamView(),
-    GroupChatView(),
     MembersView(),
+    LogView(),
     SettingsView(),
   ];
 
@@ -33,8 +33,8 @@ class _HomePageState extends State<HomePage> {
         },
         destinations: const <Widget>[
           NavigationDestination(icon: Icon(Icons.home, color: Color(0xff01ff92)), label: "Team"),
-          NavigationDestination(icon: Icon(Icons.chat, color: Color(0xff01ff92)), label: "Chat"),
           NavigationDestination(icon: Icon(Icons.radar, color: Color(0xff01ff92)), label: "Members"),
+          NavigationDestination(icon: Icon(Icons.access_time, color: Color(0xff01ff92)), label: "Log"),
           NavigationDestination(icon: Icon(Icons.settings, color: Color(0xff01ff92)), label: "Settings"),
         ],
         indicatorColor: Color.fromARGB(48, 116, 249, 156),

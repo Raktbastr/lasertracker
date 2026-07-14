@@ -10,17 +10,15 @@ Future<void> _saveSessionData(Map<String, dynamic> data, String pin) async {
     await prefs.setInt("member_id", data["id"] as int);
   }
 
-  await prefs.setString("loginGroupKey", data["join_key"] ?? "");
+  await prefs.setString("loginGroupKey", data["group_key"] ?? "");
   await prefs.setString("loginUsername", data["username"] ?? "");
   await prefs.setString("loginPin", pin);
 
   await prefs.setString("team_number", data["team_number"].toString());
   await prefs.setString("group_name", data["group_name"] ?? "");
   await prefs.setString("event_key", data["event_key"] ?? "");
-  await prefs.setString("join_key", data["join_key"] ?? "");
 
   await prefs.setString("member_id", data["id"].toString());
-  await prefs.setString("username", data["username"] ?? "");
   await prefs.setString("display_name", data["display_name"] ?? "");
   await prefs.setString("job", data["job"] ?? "");
   await prefs.setString("role", data["role"] ?? "");
@@ -34,7 +32,7 @@ Future<bool> groupLogin(String groupKey, String username, String pin) async {
   final response = await http.post(
     Uri.parse("$serverURL/login"),
     headers: {"Content-Type": "application/json"},
-    body: jsonEncode({"join_key": groupKey, "username": username, "pin": pin}),
+    body: jsonEncode({"group_key": groupKey, "username": username, "pin": pin}),
   );
 
   if (response.statusCode == 200) {
@@ -59,7 +57,7 @@ Future<bool> memberAdd(
     Uri.parse("$serverURL/groups/join"),
     headers: {"Content-Type": "application/json"},
     body: jsonEncode({
-      "join_key": groupKey,
+      "group_key": groupKey,
       "username": username,
       "display_name": displayName,
       "pin": pin,
@@ -186,12 +184,12 @@ Future<bool> isAdmin() async {
 Future<List<dynamic>> getMembers() async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
-  final joinKey = prefs.getString("loginGroupKey");
+  final groupKey = prefs.getString("loginGroupKey");
   final username = prefs.getString("loginUsername");
   final pin = prefs.getString("loginPin");
 
   final response = await http.get(
-    Uri.parse("$serverURL/groups/$joinKey/members"),
+    Uri.parse("$serverURL/groups/$groupKey/members"),
     headers: {"X-Username": username ?? "", "X-Pin": pin ?? ""},
   );
 
@@ -205,7 +203,7 @@ Future<List<dynamic>> getMembers() async {
 Future<bool> setStatus() async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
-  final groupKey = prefs.getString("join_key");
+  final groupKey = prefs.getString("loginGroupKey");
   final username = prefs.getString("loginUsername");
   final pin = prefs.getString("loginPin");
   final location = prefs.getString("location");
@@ -267,7 +265,7 @@ Future<bool> changePin(String targetUsername, String newPin) async {
 Future<bool> changeRole(String targetUsername, String newRole) async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
-  final groupKey = prefs.getString("join_key");
+  final groupKey = prefs.getString("loginGroupKey");
   final currentUsername = prefs.getString("loginUsername");
   final currentPin = prefs.getString("loginPin"); 
 
@@ -359,5 +357,27 @@ Future<bool> changeAdmin(String targetUsername, bool status) async {
     return true;
   } else {
     throw Exception("Failed to update admin status: ${response.statusCode}");
+  }
+}
+
+Future<List<dynamic>> fetchLogs() async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final groupKey = prefs.getString("loginGroupKey");
+  final currentUsername = prefs.getString("loginUsername");
+  final currentPin = prefs.getString("loginPin");
+
+  final response = await http.get(
+    Uri.parse("$serverURL/groups/$groupKey/logs"),
+    headers: {
+      "X-Username": currentUsername ?? "",
+      "X-Pin": currentPin ?? "",
+    }
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as List<dynamic>;
+  } else {
+    throw Exception("Failed to fetch logs: ${response.statusCode}");
   }
 }

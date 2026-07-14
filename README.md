@@ -25,8 +25,7 @@ The backend ([Laser Tracker Server](https://github.com/Raktbastr/lasertracker_se
 Laser Robotics hosts an instance of Laser Tracker Server at https://api.lasertracker.laserrobotics.org, which serves as the default in the app.
 
 ## Planned features
-* Live chat for each group
-* Allowing lead member privledges for multiple users
+* Battery checking
 
 ## Installation and use
 Laser Tracker does not require any installation and can be accessed at https://lasertracker.laserrobotics.org.

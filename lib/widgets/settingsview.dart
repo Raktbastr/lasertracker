@@ -11,13 +11,13 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  String joinKey = "";
+  String groupKey = "";
 
   Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
-    joinKey = prefs.getString("join_key") ?? "hi";
+    groupKey = prefs.getString("loginGroupKey") ?? "hi";
     setState(() {
-      joinKey;
+      groupKey;
     });
   }
 
@@ -40,7 +40,7 @@ class _SettingsViewState extends State<SettingsView> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
-              Text(joinKey, style: Theme.of(context).textTheme.displayMedium),
+              Text(groupKey, style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
