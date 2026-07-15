@@ -5,7 +5,7 @@ import 'package:lasertracker/screens/groupcreate.dart';
 import 'package:lasertracker/screens/homepage.dart';
 import 'package:lasertracker/screens/loginpage.dart';
 import 'package:lasertracker/screens/urlpage.dart';
-import 'package:lasertracker/widgets/settingsview.dart';
+import 'package:lasertracker/widgets/mobile/settingsview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
 
