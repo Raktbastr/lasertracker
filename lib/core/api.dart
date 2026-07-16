@@ -44,24 +44,14 @@ Future<bool> groupLogin(String groupKey, String username, String pin) async {
   }
 }
 
-Future<bool> memberAdd(
-  String username,
-  String displayName,
-  String pin,
-  String groupKey,
-) async {
+Future<bool> memberAdd(String username, String displayName, String pin, String groupKey) async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
 
   final response = await http.post(
     Uri.parse("$serverURL/groups/join"),
     headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "group_key": groupKey,
-      "username": username,
-      "display_name": displayName,
-      "pin": pin,
-    }),
+    body: jsonEncode({"group_key": groupKey, "username": username, "display_name": displayName, "pin": pin}),
   );
 
   if (response.statusCode == 201) {
@@ -110,9 +100,7 @@ Future<String> getTeamName(String teamNum) async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
 
-  final response = await http.get(
-    Uri.parse("$serverURL/tba/teaminfo/$teamNum"),
-  );
+  final response = await http.get(Uri.parse("$serverURL/tba/teaminfo/$teamNum"));
   if (response.statusCode == 200) {
     return jsonDecode(response.body)["nickname"];
   }
@@ -151,9 +139,7 @@ Future<List<dynamic>> getMatches(String teamNum, String eventKey) async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
 
-  final response = await http.get(
-    Uri.parse("$serverURL/tba/matches/$eventKey/$teamNum"),
-  );
+  final response = await http.get(Uri.parse("$serverURL/tba/matches/$eventKey/$teamNum"));
   if (response.statusCode == 200) {
     return jsonDecode(response.body) as List<dynamic>;
   } else {
@@ -169,10 +155,7 @@ Future<bool> isAdmin() async {
   final pin = prefs.getString("loginPin");
   final response = await http.get(
     Uri.parse("$serverURL/groups/$groupKey/admin-check"),
-    headers: {
-      "X-Username": username ?? "",
-      "X-Pin": pin ?? "",
-    }
+    headers: {"X-Username": username ?? "", "X-Pin": pin ?? ""},
   );
 
   if (response.statusCode == 200) {
@@ -211,11 +194,7 @@ Future<bool> setStatus() async {
 
   final response = await http.put(
     Uri.parse("$serverURL/groups/$groupKey/members/status"),
-    headers: {
-      "Content-Type": "application/json",
-      "X-Username": username ?? "",
-      "X-Pin": pin ?? "",
-    },
+    headers: {"Content-Type": "application/json", "X-Username": username ?? "", "X-Pin": pin ?? ""},
     body: jsonEncode({"location": location, "job": job}),
   );
 
@@ -236,7 +215,7 @@ Future<bool> changePin(String targetUsername, String newPin) async {
   final currentPin = prefs.getString("loginPin");
 
   bool isSelf = currentUsername?.toLowerCase() == targetUsername.toLowerCase();
-  bool adminStatus = await isAdmin(); 
+  bool adminStatus = await isAdmin();
 
   if (!isSelf && !adminStatus) {
     throw Exception("Unauthorized: You can only change your own pin unless you are an admin.");
@@ -244,11 +223,7 @@ Future<bool> changePin(String targetUsername, String newPin) async {
 
   final response = await http.put(
     Uri.parse("$serverURL/groups/$groupKey/members/$targetUsername/reset-pin"),
-    headers: {
-      "Content-Type": "application/json",
-      "X-Username": currentUsername ?? "",
-      "X-Pin": currentPin ?? "",
-    },
+    headers: {"Content-Type": "application/json", "X-Username": currentUsername ?? "", "X-Pin": currentPin ?? ""},
     body: jsonEncode({"new_pin": newPin}),
   );
 
@@ -267,7 +242,7 @@ Future<bool> changeRole(String targetUsername, String newRole) async {
   final serverURL = prefs.getString("backendURL");
   final groupKey = prefs.getString("loginGroupKey");
   final currentUsername = prefs.getString("loginUsername");
-  final currentPin = prefs.getString("loginPin"); 
+  final currentPin = prefs.getString("loginPin");
 
   bool adminStatus = await isAdmin();
 
@@ -306,15 +281,8 @@ Future<bool> updateGroup(String groupName, String eventKey) async {
 
   final response = await http.put(
     Uri.parse("$serverURL/groups/$groupKey"),
-    headers: {
-      "Content-Type": "application/json",
-      "X-Username": currentUsername ?? "",
-      "X-Pin": currentPin ?? "",
-    },
-    body: jsonEncode({
-      "group_name": groupName,
-      "event_key": eventKey,
-    }),
+    headers: {"Content-Type": "application/json", "X-Username": currentUsername ?? "", "X-Pin": currentPin ?? ""},
+    body: jsonEncode({"group_name": groupName, "event_key": eventKey}),
   );
 
   if (response.statusCode == 200) {
@@ -348,9 +316,7 @@ Future<bool> changeAdmin(String targetUsername, bool status) async {
       "X-Pin": currentPin ?? "",
       "X-Target": targetUsername,
     },
-    body: jsonEncode({
-      "is_admin": admin,
-    }),
+    body: jsonEncode({"is_admin": admin}),
   );
 
   if (response.statusCode == 200) {
@@ -369,10 +335,7 @@ Future<List<dynamic>> fetchLogs() async {
 
   final response = await http.get(
     Uri.parse("$serverURL/groups/$groupKey/logs"),
-    headers: {
-      "X-Username": currentUsername ?? "",
-      "X-Pin": currentPin ?? "",
-    }
+    headers: {"X-Username": currentUsername ?? "", "X-Pin": currentPin ?? ""},
   );
 
   if (response.statusCode == 200) {
@@ -380,4 +343,19 @@ Future<List<dynamic>> fetchLogs() async {
   } else {
     throw Exception("Failed to fetch logs: ${response.statusCode}");
   }
+}
+
+Future<List<dynamic>> fetchStream() async {
+  final prefs = await SharedPreferences.getInstance();
+  final serverURL = prefs.getString("backendURL");
+  final eventKey = prefs.getString("event_key");
+
+  final response = await http.get(Uri.parse("$serverURL/tba/event/$eventKey/stream"));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data;
+  }
+
+  return [];
 }

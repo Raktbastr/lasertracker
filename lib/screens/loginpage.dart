@@ -45,34 +45,21 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               Spacer(),
-              Image.asset(
-                "assets/tracker_logo-horizontal.png",
-                height: 75,
-                alignment: Alignment.center,
-              ),
+              Image.asset("assets/tracker_logo-horizontal.png", height: 75, alignment: Alignment.center),
               const SizedBox(height: 16),
               TextField(
                 controller: groupKeyController,
-                decoration: const InputDecoration(
-                  labelText: 'Group Code',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Group Code', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: pinController,
-                decoration: const InputDecoration(
-                  labelText: 'PIN',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'PIN', border: OutlineInputBorder()),
                 obscureText: true,
               ),
               const SizedBox(height: 16),
@@ -110,23 +97,14 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text("Login"),
               ),
               const SizedBox(height: 16),
-              TextButton(
-                child: const Text("Create an account"),
-                onPressed: () => context.push('/account-create'),
-              ),
+              TextButton(child: const Text("Create an account"), onPressed: () => context.push('/account-create')),
               const SizedBox(height: 16),
-              TextButton(
-                child: const Text("Create a group"),
-                onPressed: () => context.push('/group-create'),
-              ),
+              TextButton(child: const Text("Create a group"), onPressed: () => context.push('/group-create')),
               Spacer(),
               Row(
                 children: [
                   Spacer(),
-                  FloatingActionButton(
-                    onPressed: () => context.push('/url-change'),
-                    child: const Icon(Icons.link),
-                  ),
+                  FloatingActionButton(onPressed: () => context.push('/url-change'), child: const Icon(Icons.link)),
                 ],
               ),
             ],

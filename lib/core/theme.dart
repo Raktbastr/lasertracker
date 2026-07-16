@@ -75,7 +75,7 @@ final ThemeData laserTheme = ThemeData(
 
   inputDecorationTheme: const InputDecorationTheme(
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: Color(0xff00ff92), width: 2.0),
+      borderSide: BorderSide(color: Color(0xff00ff92), width: 2),
     ),
     floatingLabelStyle: TextStyle(color: Colors.white),
     hintStyle: TextStyle(color: Colors.white54),

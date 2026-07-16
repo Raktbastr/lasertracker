@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MembersView extends StatefulWidget {
-  const MembersView({super.key});
+class MobileMembersView extends StatefulWidget {
+  const MobileMembersView({super.key});
 
   @override
-  State<MembersView> createState() => _MembersViewState();
+  State<MobileMembersView> createState() => _MobileMembersViewState();
 }
 
-class _MembersViewState extends State<MembersView> {
+class _MobileMembersViewState extends State<MobileMembersView> {
   List<String> locations = [
     "Cafeteria",
     "Stands",
@@ -45,8 +45,7 @@ class _MembersViewState extends State<MembersView> {
   final TextEditingController jobController = TextEditingController();
   final TextEditingController roleController = TextEditingController();
   final TextEditingController customJobController = TextEditingController();
-  final TextEditingController customLocationController =
-      TextEditingController();
+  final TextEditingController customLocationController = TextEditingController();
   final TextEditingController newPinController = TextEditingController();
 
   List<DropdownMenuEntry> listToEntries(List list) {
@@ -88,8 +87,7 @@ class _MembersViewState extends State<MembersView> {
     return showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController memberRoleController =
-            TextEditingController(text: role);
+        final TextEditingController memberRoleController = TextEditingController(text: role);
         bool isAdmin;
         if (memberData["is_admin"] == 1) {
           isAdmin = true;
@@ -107,17 +105,10 @@ class _MembersViewState extends State<MembersView> {
                     DropdownMenu(
                       expandedInsets: EdgeInsets.zero,
                       controller: memberRoleController,
-                      label: Text(
-                        "Role",
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      inputDecorationTheme: const InputDecorationTheme(
-                        border: OutlineInputBorder(),
-                      ),
+                      label: Text("Role", style: Theme.of(context).textTheme.titleSmall),
+                      inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
                       initialSelection: role,
-                      enabled:
-                          userIsAdmin &&
-                          (memberData["username"] != loggedInUsername),
+                      enabled: userIsAdmin && (memberData["username"] != loggedInUsername),
                       dropdownMenuEntries: listToEntries(roles),
                       onSelected: (value) {
                         memberRoleController.text = value ?? "";
@@ -137,10 +128,7 @@ class _MembersViewState extends State<MembersView> {
                     const SizedBox(height: 16),
                     TextField(
                       controller: newPinController,
-                      decoration: const InputDecoration(
-                        labelText: "New Pin (Optional)",
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: const InputDecoration(labelText: "New Pin (Optional)", border: OutlineInputBorder()),
                     ),
                   ],
                 ),
@@ -150,22 +138,12 @@ class _MembersViewState extends State<MembersView> {
                   onPressed: () async {
                     try {
                       if (newPinController.text != "") {
-                        await changePin(
-                          memberData["username"],
-                          newPinController.text,
-                        );
+                        await changePin(memberData["username"], newPinController.text);
                         newPinController.text = "";
                       }
-                      await changeRole(
-                        memberData["username"],
-                        memberRoleController.text,
-                      );
+                      await changeRole(memberData["username"], memberRoleController.text);
                       await changeAdmin(memberData["username"], isAdmin);
-                      scaffoldMessenger.showSnackBar(
-                        const SnackBar(
-                          content: Text("Member updated successfully!"),
-                        ),
-                      );
+                      scaffoldMessenger.showSnackBar(const SnackBar(content: Text("Member updated successfully!")));
                       if (context.mounted) {
                         Navigator.pop(context, true);
                       }
@@ -212,10 +190,7 @@ class _MembersViewState extends State<MembersView> {
           Column(
             children: [
               const SizedBox(height: 16),
-              Text(
-                "Your Status",
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
+              Text("Your Status", style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 5),
               Column(
                 children: [
@@ -223,9 +198,7 @@ class _MembersViewState extends State<MembersView> {
                     controller: locationController,
                     expandedInsets: EdgeInsets.zero,
                     label: const Text("Location"),
-                    inputDecorationTheme: const InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
+                    inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
                     onSelected: (value) async {
                       try {
                         if (value == "Custom") {
@@ -245,22 +218,15 @@ class _MembersViewState extends State<MembersView> {
                                   ElevatedButton(
                                     onPressed: () async {
                                       try {
-                                        final prefs =
-                                            await SharedPreferences.getInstance();
-                                        await prefs.setString(
-                                          "location",
-                                          customLocationController.text,
-                                        );
+                                        final prefs = await SharedPreferences.getInstance();
+                                        await prefs.setString("location", customLocationController.text);
                                         await setStatus();
-                                        locationController.text =
-                                            customLocationController.text;
+                                        locationController.text = customLocationController.text;
                                         if (mounted) Navigator.pop(context);
                                       } catch (e) {
                                         scaffoldMessenger.showSnackBar(
                                           SnackBar(
-                                            content: Text(
-                                              "Error: ${e.toString()}",
-                                            ),
+                                            content: Text("Error: ${e.toString()}"),
                                             behavior: SnackBarBehavior.floating,
                                             margin: const EdgeInsets.all(16),
                                           ),
@@ -303,9 +269,7 @@ class _MembersViewState extends State<MembersView> {
                     controller: jobController,
                     expandedInsets: EdgeInsets.zero,
                     label: const Text("Job"),
-                    inputDecorationTheme: const InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
+                    inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
                     onSelected: (value) async {
                       try {
                         if (value == "Custom") {
@@ -325,22 +289,15 @@ class _MembersViewState extends State<MembersView> {
                                   ElevatedButton(
                                     onPressed: () async {
                                       try {
-                                        final prefs =
-                                            await SharedPreferences.getInstance();
-                                        await prefs.setString(
-                                          "job",
-                                          customJobController.text,
-                                        );
+                                        final prefs = await SharedPreferences.getInstance();
+                                        await prefs.setString("job", customJobController.text);
                                         await setStatus();
-                                        jobController.text =
-                                            customJobController.text;
+                                        jobController.text = customJobController.text;
                                         if (mounted) Navigator.pop(context);
                                       } catch (e) {
                                         scaffoldMessenger.showSnackBar(
                                           SnackBar(
-                                            content: Text(
-                                              "Error: ${e.toString()}",
-                                            ),
+                                            content: Text("Error: ${e.toString()}"),
                                             behavior: SnackBarBehavior.floating,
                                             margin: const EdgeInsets.all(16),
                                           ),
@@ -383,9 +340,7 @@ class _MembersViewState extends State<MembersView> {
                     expandedInsets: EdgeInsets.zero,
                     controller: roleController,
                     label: const Text("Role"),
-                    inputDecorationTheme: const InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
+                    inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
                     enabled: false,
                     initialSelection: currRole,
                     onSelected: (value) async {
@@ -410,19 +365,16 @@ class _MembersViewState extends State<MembersView> {
           Column(
             children: [
               const SizedBox(height: 16),
-              Text(
-                "Team Members",
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
+              Text("Team Members", style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 5),
               FutureBuilder(
                 future: Future.wait([getMembers(), isAdmin()]),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                     final results = snapshot.data as List<dynamic>;
                     final List members = results[0] as List;
                     final bool admin = results[1] as bool;
+                    final bool canEditUser = admin;
 
                     final Map<String, List> groups = {};
                     for (var m in members) {
@@ -430,10 +382,7 @@ class _MembersViewState extends State<MembersView> {
                       if (m["username"] == loggedInUsername) {
                         if (members.length - 1 == 0) {
                           return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text("No Members"),
-                            ),
+                            child: Padding(padding: EdgeInsets.all(16), child: Text("No Members")),
                           );
                         }
                         continue;
@@ -443,7 +392,6 @@ class _MembersViewState extends State<MembersView> {
                     }
 
                     return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: groups.entries.map((entry) {
                         final loc = entry.key;
                         final list = entry.value;
@@ -451,53 +399,46 @@ class _MembersViewState extends State<MembersView> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(height: 10),
-                            Text(
-                              loc,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
+                            Text(loc, style: Theme.of(context).textTheme.titleLarge),
                             const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "Name",
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleSmall,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "Name",
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.titleSmall,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    "Role",
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleSmall,
+                                  Expanded(
+                                    child: Text(
+                                      "Role",
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.titleSmall,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    "Job",
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleSmall,
+                                  Expanded(
+                                    child: Text(
+                                      "Job",
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.titleSmall,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 48),
-                              ],
+                                  canEditUser
+                                      ? const SizedBox(width: 48)
+                                      : const SizedBox(width: 0),
+                                ],
+                              ),
                             ),
                             ...list.map<Widget>((member) {
                               final name = member["display_name"] ?? "";
                               final role = member["role"] ?? "";
                               final job = member["job"] ?? "";
-                              final bool canEditUser = admin;
 
                               return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Column(
                                   children: [
                                     const Divider(),
@@ -507,46 +448,39 @@ class _MembersViewState extends State<MembersView> {
                                           child: Text(
                                             name,
                                             textAlign: TextAlign.center,
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleSmall,
+                                            style: Theme.of(context).textTheme.titleSmall,
                                           ),
                                         ),
                                         Expanded(
                                           child: Text(
                                             role,
                                             textAlign: TextAlign.center,
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleSmall,
+                                            style: Theme.of(context).textTheme.titleSmall,
                                           ),
                                         ),
                                         Expanded(
                                           child: Text(
                                             job,
                                             textAlign: TextAlign.center,
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleSmall,
+                                            style: Theme.of(context).textTheme.titleSmall,
                                           ),
                                         ),
                                         canEditUser
                                             ? IconButton.filled(
                                                 onPressed: () async {
-                                                  final bool? updated =
-                                                      await showEditDialog(
-                                                        context,
-                                                        role,
-                                                        scaffoldMessenger,
-                                                        member,
-                                                      );
+                                                  final bool? updated = await showEditDialog(
+                                                    context,
+                                                    role,
+                                                    scaffoldMessenger,
+                                                    member,
+                                                  );
                                                   if (updated == true) {
                                                     setState(() {});
                                                   }
                                                 },
-                                                icon: const Icon(Icons.pin),
+                                                icon: const Icon(Icons.edit),
                                               )
-                                            : const SizedBox(width: 48),
+                                            : const SizedBox(width: 0),
                                       ],
                                     ),
                                   ],
@@ -560,12 +494,8 @@ class _MembersViewState extends State<MembersView> {
                   }
                   return const Center(
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(),
-                      ),
+                      padding: EdgeInsets.all(16),
+                      child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
                     ),
                   );
                 },

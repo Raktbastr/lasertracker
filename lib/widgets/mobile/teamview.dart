@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class TeamView extends StatefulWidget {
-  const TeamView({super.key});
+class MobileTeamView extends StatefulWidget {
+  const MobileTeamView({super.key});
 
   @override
-  State<TeamView> createState() => _TeamViewState();
+  State<MobileTeamView> createState() => _MobileTeamViewState();
 }
 
-class _TeamViewState extends State<TeamView> {
+class _MobileTeamViewState extends State<MobileTeamView> {
   String teamNum = "";
   String groupName = "";
   String eventKey = "";
@@ -56,15 +56,10 @@ class _TeamViewState extends State<TeamView> {
                 child: FutureBuilder<Image>(
                   future: getTeamAvatar(teamNum),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
+                    if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                       return snapshot.data!;
                     }
-                    return const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(),
-                    );
+                    return const SizedBox(width: 40, height: 40, child: CircularProgressIndicator());
                   },
                 ),
               ),
@@ -72,20 +67,14 @@ class _TeamViewState extends State<TeamView> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    groupName,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text(groupName, style: Theme.of(context).textTheme.titleLarge),
                   Text("Team $teamNum"),
                 ],
               ),
               Spacer(),
               Column(
                 children: [
-                  Text(
-                    "Join Key",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text("Join Key", style: Theme.of(context).textTheme.titleLarge),
                   Text(groupKey),
                 ],
               ),
@@ -99,7 +88,7 @@ class _TeamViewState extends State<TeamView> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError || !snapshot.hasData) {
-                return const Text("Failed to retrieve match info.");
+                return const Text("Failed to retrieve drive team info.");
               }
 
               final data = snapshot.data as List<dynamic>;
@@ -114,10 +103,7 @@ class _TeamViewState extends State<TeamView> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Drive Team",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text("Drive Team", style: Theme.of(context).textTheme.titleLarge),
                   SizedBox(height: 4),
                   Divider(),
                   SizedBox(height: 4),
@@ -130,19 +116,14 @@ class _TeamViewState extends State<TeamView> {
                             itemCount: driveTeam.length,
                             itemBuilder: (context, index) {
                               return Padding(
-                                padding: const EdgeInsets.only(right: 16.0),
+                                padding: const EdgeInsets.only(right: 16),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
+                                    Text(driveTeam[index]["display_name"], textAlign: TextAlign.center),
                                     Text(
-                                      driveTeam[index]["display_name"],
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    Text(
-                                      driveTeam[index]["job"]
-                                          .toString()
-                                          .replaceAll("Drive Team - ", ""),
+                                      driveTeam[index]["job"].toString().replaceAll("Drive Team - ", ""),
                                       textAlign: TextAlign.center,
                                     ),
                                     Text(driveTeam[index]["location"]),
@@ -171,18 +152,13 @@ class _TeamViewState extends State<TeamView> {
 
               for (var match in data) {
                 if (match["actual_time"] == null) {
-                  String matchKey = match["key"].toString().replaceAll(
-                    "${eventKey}_",
-                    "",
-                  );
+                  String matchKey = match["key"].toString().replaceAll("${eventKey}_", "");
                   String matchNum = "Unknown";
 
                   if (matchKey.startsWith("qm")) {
                     matchNum = "Quals ${matchKey.replaceFirst("qm", "")}";
                   } else if (matchKey.startsWith("sf")) {
-                    final sfMatch = RegExp(
-                      r'^sf(\d+)m(\d+)$',
-                    ).firstMatch(matchKey);
+                    final sfMatch = RegExp(r'^sf(\d+)m(\d+)$').firstMatch(matchKey);
 
                     if (sfMatch != null) {
                       int bracketMatchNumber = int.parse(sfMatch.group(1)!);
@@ -234,25 +210,20 @@ class _TeamViewState extends State<TeamView> {
                     }
                   }
 
-                  List<String> redTeams =
-                      (match["alliances"]["red"]["team_keys"] as List)
-                          .map((team) => team.toString().replaceAll("frc", ""))
-                          .toList();
+                  List<String> redTeams = (match["alliances"]["red"]["team_keys"] as List)
+                      .map((team) => team.toString().replaceAll("frc", ""))
+                      .toList();
 
-                  List<String> blueTeams =
-                      (match["alliances"]["blue"]["team_keys"] as List)
-                          .map((team) => team.toString().replaceAll("frc", ""))
-                          .toList();
+                  List<String> blueTeams = (match["alliances"]["blue"]["team_keys"] as List)
+                      .map((team) => team.toString().replaceAll("frc", ""))
+                      .toList();
 
                   int? timestamp = match["predicted_time"] ?? match["time"];
                   String timeStr = "TBD";
 
                   if (timestamp != null) {
-                    DateTime dt = DateTime.fromMillisecondsSinceEpoch(
-                      timestamp * 1000,
-                    );
-                    timeStr =
-                        "${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
+                    DateTime dt = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+                    timeStr = "${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
                   }
 
                   matches.add([matchNum, timeStr, redTeams, blueTeams]);
@@ -261,10 +232,7 @@ class _TeamViewState extends State<TeamView> {
 
               if (matches.isEmpty) {
                 return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text("No Upcoming Matches"),
-                  ),
+                  child: Padding(padding: EdgeInsets.all(16), child: Text("No Upcoming Matches")),
                 );
               }
 
@@ -273,10 +241,7 @@ class _TeamViewState extends State<TeamView> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    "Next Match",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text("Next Match", style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 4),
                   Divider(),
                   const SizedBox(height: 4),
@@ -285,9 +250,7 @@ class _TeamViewState extends State<TeamView> {
                     children: [
                       Builder(
                         builder: (context) {
-                          if (nextMatch[2][0] == teamNum ||
-                              nextMatch[2][1] == teamNum ||
-                              nextMatch[2][2] == teamNum) {
+                          if (nextMatch[2][0] == teamNum || nextMatch[2][1] == teamNum || nextMatch[2][2] == teamNum) {
                             return Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -297,19 +260,13 @@ class _TeamViewState extends State<TeamView> {
                                 child: Padding(
                                   padding: EdgeInsets.all(5),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "Red Alliance",
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                       ),
-                                      Text(
-                                        "${nextMatch[2][0]}, ${nextMatch[2][1]}, ${nextMatch[2][2]}",
-                                      ),
+                                      Text("${nextMatch[2][0]}, ${nextMatch[2][1]}, ${nextMatch[2][2]}"),
                                     ],
                                   ),
                                 ),
@@ -336,15 +293,10 @@ class _TeamViewState extends State<TeamView> {
                         },
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           children: [
-                            Text(
-                              "${nextMatch[0]}",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            Text("${nextMatch[0]}", style: const TextStyle(fontWeight: FontWeight.bold)),
                             const Text("VS"),
                             Text("${nextMatch[1]}"),
                           ],
@@ -352,9 +304,7 @@ class _TeamViewState extends State<TeamView> {
                       ),
                       Builder(
                         builder: (context) {
-                          if (nextMatch[3][0] == teamNum ||
-                              nextMatch[3][1] == teamNum ||
-                              nextMatch[3][2] == teamNum) {
+                          if (nextMatch[3][0] == teamNum || nextMatch[3][1] == teamNum || nextMatch[3][2] == teamNum) {
                             return Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -364,16 +314,12 @@ class _TeamViewState extends State<TeamView> {
                                 child: Padding(
                                   padding: EdgeInsets.all(5),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "Blue Alliance",
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         "${nextMatch[3][0]} ${nextMatch[3][1]} ${nextMatch[3][2]}",
@@ -409,11 +355,8 @@ class _TeamViewState extends State<TeamView> {
 
                   if (matches.length > 1) ...[
                     Padding(
-                      padding: EdgeInsets.only(top: 24.0, bottom: 8.0),
-                      child: Text(
-                        "Upcoming Matches",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                      padding: EdgeInsets.only(top: 24, bottom: 8),
+                      child: Text("Upcoming Matches", style: Theme.of(context).textTheme.titleMedium),
                     ),
                     ListView.builder(
                       shrinkWrap: true,
@@ -427,9 +370,7 @@ class _TeamViewState extends State<TeamView> {
                             Divider(),
                             const SizedBox(height: 5),
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -441,26 +382,18 @@ class _TeamViewState extends State<TeamView> {
                                         return Expanded(
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.red,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
+                                              border: Border.all(color: Colors.red),
+                                              borderRadius: BorderRadius.circular(15),
                                             ),
                                             child: Padding(
                                               padding: EdgeInsets.all(5),
                                               child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "Red Alliance",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                                   ),
                                                   Text(
                                                     "${upcomingMatch[2][0]} ${upcomingMatch[2][1]} ${upcomingMatch[2][2]}",
@@ -474,15 +407,12 @@ class _TeamViewState extends State<TeamView> {
                                       } else {
                                         return Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                               Text(
                                                 "Red Alliance",
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                ),
+                                                style: TextStyle(color: Colors.red),
                                               ),
                                               Text(
                                                 "${upcomingMatch[2][0]} ${upcomingMatch[2][1]} ${upcomingMatch[2][2]}",
@@ -495,16 +425,12 @@ class _TeamViewState extends State<TeamView> {
                                     },
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 24.0,
-                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 24),
                                     child: Column(
                                       children: [
                                         Text(
                                           "${upcomingMatch[0]}",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
                                           textAlign: TextAlign.center,
                                         ),
                                         const Text("VS"),
@@ -520,26 +446,18 @@ class _TeamViewState extends State<TeamView> {
                                         return Expanded(
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.blue,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
+                                              border: Border.all(color: Colors.blue),
+                                              borderRadius: BorderRadius.circular(15),
                                             ),
                                             child: Padding(
                                               padding: EdgeInsets.all(5),
                                               child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "Blue Alliance",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: Colors.blue,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                                                   ),
                                                   Text(
                                                     "${upcomingMatch[3][0]} ${upcomingMatch[3][1]} ${upcomingMatch[3][2]}",
@@ -553,15 +471,12 @@ class _TeamViewState extends State<TeamView> {
                                       } else {
                                         return Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                               Text(
                                                 "Blue Alliance",
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.blue,
-                                                ),
+                                                style: TextStyle(color: Colors.blue),
                                               ),
                                               Text(
                                                 "${upcomingMatch[3][0]} ${upcomingMatch[3][1]} ${upcomingMatch[3][2]}",

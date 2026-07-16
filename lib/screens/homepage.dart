@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lasertracker/widgets/desktop/logview.dart';
+import 'package:lasertracker/widgets/desktop/membersview.dart';
+import 'package:lasertracker/widgets/desktop/teamview.dart';
 import 'package:lasertracker/widgets/mobile/logview.dart';
 import 'package:lasertracker/widgets/mobile/membersview.dart';
 import 'package:lasertracker/widgets/mobile/settingsview.dart';
@@ -14,23 +17,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
-  final List<Widget> desktopPages = const [
-    TeamView(),
-    MembersView(),
-    LogView(),
-    SettingsView(),
-  ];
+  final List<Widget> desktopPages = const [DesktopTeamView(), DesktopMembersView(), DesktopLogView(), SettingsView()];
 
-  final List<Widget> mobilePages = const [
-    TeamView(),
-    MembersView(),
-    LogView(),
-    SettingsView(),
-  ];
+  final List<Widget> mobilePages = const [MobileTeamView(), MobileMembersView(), MobileLogView(), SettingsView()];
 
   @override
   Widget build(BuildContext context) {
-    final isWideScreen = MediaQuery.of(context).size.width >= 600;
+    final isWideScreen = MediaQuery.of(context).size.width >= 1000;
 
     return Scaffold(
       body: SafeArea(
@@ -44,7 +37,7 @@ class _HomePageState extends State<HomePage> {
                         pageIndex = index;
                       });
                     },
-                    leading: Image.asset("assets/icon/favicon.png"),
+                    leading: Image.asset("assets/tracker_icon.png", width: 64),
                     labelType: NavigationRailLabelType.all,
                     indicatorColor: const Color.fromARGB(48, 116, 249, 156),
                     destinations: const [

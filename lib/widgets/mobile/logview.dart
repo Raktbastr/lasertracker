@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
 
-class LogView extends StatefulWidget {
-  const LogView({super.key});
+class MobileLogView extends StatefulWidget {
+  const MobileLogView({super.key});
 
   @override
-  State<LogView> createState() => _LogViewState();
+  State<MobileLogView> createState() => _MobileLogViewState();
 }
 
-class _LogViewState extends State<LogView> {
+class _MobileLogViewState extends State<MobileLogView> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -19,16 +19,13 @@ class _LogViewState extends State<LogView> {
       child: FutureBuilder(
         future: fetchLogs(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
             final data = snapshot.data as List<dynamic>;
             return ListView.builder(
               shrinkWrap: true,
               itemCount: data.length,
               itemBuilder: (context, index) {
-                DateTime dt = DateTime.fromMillisecondsSinceEpoch(
-                  (data[index]["timestamp"] * 1000).round(),
-                ).toLocal();
+                DateTime dt = DateTime.fromMillisecondsSinceEpoch((data[index]["timestamp"] * 1000).round()).toLocal();
                 String action = data[index]["action"];
                 String username = data[index]["username"];
                 return Text("[$dt] $username $action");
@@ -37,12 +34,8 @@ class _LogViewState extends State<LogView> {
           }
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(),
-              ),
+              padding: EdgeInsets.all(16),
+              child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
             ),
           );
         },

@@ -35,10 +35,7 @@ class _SettingsViewState extends State<SettingsView> {
         children: [
           Column(
             children: [
-              Text(
-                "Group Join Key",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text("Group Join Key", style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               Text(groupKey, style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 16),
@@ -49,14 +46,11 @@ class _SettingsViewState extends State<SettingsView> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Log out'),
-                        content: const Text(
-                          'Are you sure you want to log out.',
-                        ),
+                        content: const Text('Are you sure you want to log out.'),
                         actions: <Widget>[
                           ElevatedButton(
                             onPressed: () async {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
                               String url = prefs.getString("backendURL")!;
                               await prefs.clear();
                               prefs.setString("backendURL", url);

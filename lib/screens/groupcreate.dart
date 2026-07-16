@@ -64,10 +64,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               SizedBox(height: 16),
               TextField(
                 controller: teamNumController,
-                decoration: InputDecoration(
-                  labelText: "Team Number",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: InputDecoration(labelText: "Team Number", border: OutlineInputBorder()),
                 keyboardType: TextInputType.number,
               ),
               SizedBox(height: 16),
@@ -79,31 +76,21 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                     FutureBuilder<Image>(
                       future: getTeamAvatar(teamNum),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
+                        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                           return snapshot.data!;
                         }
-                        return SizedBox(
-                          width: 10,
-                          height: 10,
-                          child: CircularProgressIndicator(),
-                        );
+                        return SizedBox(width: 10, height: 10, child: CircularProgressIndicator());
                       },
                     ),
                     SizedBox(width: 8),
                     FutureBuilder<String>(
                       future: getTeamName(teamNum),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
+                        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                           teamName = snapshot.data!;
                           return Text(snapshot.data!);
                         }
-                        return SizedBox(
-                          width: 10,
-                          height: 10,
-                          child: CircularProgressIndicator(),
-                        );
+                        return SizedBox(width: 10, height: 10, child: CircularProgressIndicator());
                       },
                     ),
                     Spacer(),
@@ -115,10 +102,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                 future: getEvents(teamNum),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
-                    return const SizedBox(
-                      height: 48,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
+                    return const SizedBox(height: 48, child: Center(child: CircularProgressIndicator()));
                   }
                   if (snapshot.hasError) {
                     return const Text("Failed to load events");
@@ -128,24 +112,16 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                         if (item is Map && item.length == 1) {
                           final displayName = item.keys.first.toString();
                           final value = item.values.first;
-                          return DropdownMenuEntry<Object?>(
-                            value: value,
-                            label: displayName,
-                          );
+                          return DropdownMenuEntry<Object?>(value: value, label: displayName);
                         }
-                        return DropdownMenuEntry<Object?>(
-                          value: item,
-                          label: item.toString(),
-                        );
+                        return DropdownMenuEntry<Object?>(value: item, label: item.toString());
                       }).toList() ??
                       [];
                   return DropdownMenu<Object?>(
                     controller: eventSelectorController,
                     enableFilter: true,
                     requestFocusOnTap: true,
-                    inputDecorationTheme: InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
+                    inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder()),
                     label: Text("Select Event"),
                     onSelected: (value) {
                       eventCode = value.toString();
@@ -163,10 +139,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               SizedBox(height: 16),
               TextField(
                 controller: displaynameController,
-                decoration: InputDecoration(
-                  labelText: "Display Name",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: InputDecoration(labelText: "Display Name", border: OutlineInputBorder()),
               ),
               Text(
                 "This is the name that will be displayed to other members in the group.",
@@ -175,10 +148,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               SizedBox(height: 16),
               TextField(
                 controller: usernameController,
-                decoration: InputDecoration(
-                  labelText: "Username",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: InputDecoration(labelText: "Username", border: OutlineInputBorder()),
               ),
               Text(
                 "This is the name that will be used to log in to the group.",
@@ -187,10 +157,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               SizedBox(height: 16),
               TextField(
                 controller: pinController,
-                decoration: InputDecoration(
-                  labelText: "PIN",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: InputDecoration(labelText: "PIN", border: OutlineInputBorder()),
               ),
               Text(
                 "This is the password that will be used to log in to the group.",
@@ -232,9 +199,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   });
                 },
                 child: isLoading
-                    ? CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      )
+                    ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
                     : Text("Create Group"),
               ),
             ],

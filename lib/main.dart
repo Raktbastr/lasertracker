@@ -21,7 +21,8 @@ final GoRouter router = GoRouter(
     if (isLoggedIn) {
       if (currentLocation == '/login' ||
           currentLocation == '/account-create' ||
-          currentLocation == '/group-create' || currentLocation == '/url-change') {
+          currentLocation == '/group-create' ||
+          currentLocation == '/url-change') {
         return '/home';
       }
     } else {
@@ -35,19 +36,10 @@ final GoRouter router = GoRouter(
   initialLocation: '/login',
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-    GoRoute(
-      path: "/settings",
-      builder: (context, state) => const SettingsView(),
-    ),
+    GoRoute(path: "/settings", builder: (context, state) => const SettingsView()),
     GoRoute(path: '/url-change', builder: (context, state) => const URLPage()),
-    GoRoute(
-      path: '/account-create',
-      builder: (context, state) => const AccountCreatePage(),
-    ),
-    GoRoute(
-      path: '/group-create',
-      builder: (context, state) => const GroupCreatePage(),
-    ),
+    GoRoute(path: '/account-create', builder: (context, state) => const AccountCreatePage()),
+    GoRoute(path: '/group-create', builder: (context, state) => const GroupCreatePage()),
     GoRoute(path: '/home', builder: (context, state) => const HomePage()),
   ],
 );
@@ -61,10 +53,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Laser Tracker',
-      theme: laserTheme,
-      routerConfig: router,
-    );
+    return MaterialApp.router(title: 'Laser Tracker', theme: laserTheme, routerConfig: router);
   }
 }

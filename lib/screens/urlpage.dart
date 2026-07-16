@@ -30,10 +30,7 @@ class _URLPageState extends State<URLPage> {
   Future<void> saveData() async {
     final prefs = await SharedPreferences.getInstance();
     if (backendURLController.text == "") {
-      await prefs.setString(
-        'backendURL',
-        "https://api.lasertracker.laserrobotics.org",
-      );
+      await prefs.setString('backendURL', "https://api.lasertracker.laserrobotics.org");
     } else {
       await prefs.setString('backendURL', backendURLController.text);
     }
@@ -56,10 +53,7 @@ class _URLPageState extends State<URLPage> {
           padding: EdgeInsets.all(16),
           child: Column(
             children: [
-              Text(
-                "Laser Tracker Server URL",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text("Laser Tracker Server URL", style: Theme.of(context).textTheme.titleLarge),
               Text(
                 "Set the URL of the Laser Tracker Server instance. Leave it blank to use the default.",
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -81,14 +75,11 @@ class _URLPageState extends State<URLPage> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Logout and Reset Data'),
-                        content: const Text(
-                          'Are you sure you want to reset all data? This will log you out.',
-                        ),
+                        content: const Text('Are you sure you want to reset all data? This will log you out.'),
                         actions: <Widget>[
                           ElevatedButton(
                             onPressed: () async {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
                               await prefs.clear();
                               context.go('/login');
                             },
