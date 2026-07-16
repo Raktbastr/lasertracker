@@ -51,7 +51,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
       });
     });
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,21 +76,37 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                     FutureBuilder<Image>(
                       future: getTeamAvatar(teamNum),
                       builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(child: Text("Error fetching team avatar"));
+                        }
                         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                           return snapshot.data!;
                         }
-                        return SizedBox(width: 10, height: 10, child: CircularProgressIndicator());
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                          ),
+                        );
                       },
                     ),
                     SizedBox(width: 8),
                     FutureBuilder<String>(
                       future: getTeamName(teamNum),
                       builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(child: Text("Error fetching team name"));
+                        }
                         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                           teamName = snapshot.data!;
                           return Text(snapshot.data!);
                         }
-                        return SizedBox(width: 10, height: 10, child: CircularProgressIndicator());
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                          ),
+                        );
                       },
                     ),
                     Spacer(),
@@ -101,13 +117,11 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               FutureBuilder<List<dynamic>>(
                 future: getEvents(teamNum),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return const SizedBox(height: 48, child: Center(child: CircularProgressIndicator()));
-                  }
                   if (snapshot.hasError) {
-                    return const Text("Failed to load events");
+                    return Center(child: Text("Error fetching events"));
                   }
-                  final entries =
+                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                    final entries =
                       snapshot.data?.map<DropdownMenuEntry<Object?>>((item) {
                         if (item is Map && item.length == 1) {
                           final displayName = item.keys.first.toString();
@@ -127,6 +141,13 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                       eventCode = value.toString();
                     },
                     dropdownMenuEntries: entries,
+                  );
+                  }
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                    ),
                   );
                 },
               ),

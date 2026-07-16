@@ -29,7 +29,7 @@ class _DesktopTeamViewState extends State<DesktopTeamView> {
 
   void loadData() async {
     final prefs = await SharedPreferences.getInstance();
-    final streams = await fetchStream();
+    final streams = await getStream();
 
     setState(() {
       teamNum = prefs.getString("team_number") ?? "";
@@ -75,10 +75,18 @@ class _DesktopTeamViewState extends State<DesktopTeamView> {
                         child: FutureBuilder<Image>(
                           future: getTeamAvatar(teamNum),
                           builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(child: Text("Error fetching team avatar"));
+                            }
                             if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                               return snapshot.data!;
                             }
-                            return const SizedBox(width: 40, height: 40, child: CircularProgressIndicator());
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -131,10 +139,15 @@ class _DesktopTeamViewState extends State<DesktopTeamView> {
                       future: getMatches(teamNum, eventKey),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                            ),
+                          );
                         }
-                        if (snapshot.hasError || !snapshot.hasData) {
-                          return const Text("Failed to retrieve match info.");
+                        if (snapshot.hasError) {
+                          return Center(child: Text("Error fetching matches"));
                         }
 
                         final data = snapshot.data as List<dynamic>;
@@ -357,10 +370,15 @@ class _DesktopTeamViewState extends State<DesktopTeamView> {
                       future: getMembers(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                            ),
+                          );
                         }
-                        if (snapshot.hasError || !snapshot.hasData) {
-                          return const Text("Failed to retrieve drive team info.");
+                        if (snapshot.hasError) {
+                          return Center(child: Text("Error fetching members"));
                         }
 
                         final data = snapshot.data as List<dynamic>;
@@ -422,8 +440,14 @@ class _DesktopTeamViewState extends State<DesktopTeamView> {
                     future: getMatches(teamNum, eventKey),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                          ),
+                        );
                       }
+
                       if (snapshot.hasError || !snapshot.hasData) {
                         return const Text("Failed to retrieve match info.");
                       }

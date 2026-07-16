@@ -56,10 +56,18 @@ class _MobileTeamViewState extends State<MobileTeamView> {
                 child: FutureBuilder<Image>(
                   future: getTeamAvatar(teamNum),
                   builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text("Error fetching team avatar"));
+                    }
                     if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                       return snapshot.data!;
                     }
-                    return const SizedBox(width: 40, height: 40, child: CircularProgressIndicator());
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -85,10 +93,15 @@ class _MobileTeamViewState extends State<MobileTeamView> {
             future: getMembers(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                  ),
+                );
               }
-              if (snapshot.hasError || !snapshot.hasData) {
-                return const Text("Failed to retrieve drive team info.");
+              if (snapshot.hasError) {
+                return Center(child: Text("Error fetching members"));
               }
 
               final data = snapshot.data as List<dynamic>;
@@ -141,10 +154,15 @@ class _MobileTeamViewState extends State<MobileTeamView> {
             future: getMatches(teamNum, eventKey),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                    ),
+                  );
               }
-              if (snapshot.hasError || !snapshot.hasData) {
-                return const Text("Failed to retrieve match info.");
+              if (snapshot.hasError) {
+                return Center(child: Text("Error fetching matches"));
               }
 
               final data = snapshot.data as List<dynamic>;

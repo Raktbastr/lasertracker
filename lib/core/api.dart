@@ -131,8 +131,9 @@ Future<List<dynamic>> getEvents(String teamNum) async {
   if (response.statusCode == 200) {
     List data = jsonDecode(response.body);
     return data.map((event) => {event["name"]: event["key"]}).toList();
+  } else {
+    throw Exception("Failed to load events: ${response.statusCode}");
   }
-  return [];
 }
 
 Future<List<dynamic>> getMatches(String teamNum, String eventKey) async {
@@ -326,7 +327,7 @@ Future<bool> changeAdmin(String targetUsername, bool status) async {
   }
 }
 
-Future<List<dynamic>> fetchLogs() async {
+Future<List<dynamic>> getLogs() async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
   final groupKey = prefs.getString("loginGroupKey");
@@ -345,7 +346,7 @@ Future<List<dynamic>> fetchLogs() async {
   }
 }
 
-Future<List<dynamic>> fetchStream() async {
+Future<List<dynamic>> getStream() async {
   final prefs = await SharedPreferences.getInstance();
   final serverURL = prefs.getString("backendURL");
   final eventKey = prefs.getString("event_key");

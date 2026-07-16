@@ -21,8 +21,11 @@ class _DesktopLogViewState extends State<DesktopLogView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FutureBuilder(
-            future: fetchLogs(),
+            future: getLogs(),
             builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text("Error fetching logs"));
+              }
               if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                 final data = snapshot.data as List<dynamic>;
                 return ListView.builder(

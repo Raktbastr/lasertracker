@@ -378,6 +378,9 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
               FutureBuilder(
                 future: Future.wait([getMembers(), isAdmin()]),
                 builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error fetching members"));
+                  }
                   if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                     final results = snapshot.data as List<dynamic>;
                     final List members = results[0] as List;
