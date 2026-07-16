@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +21,7 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
     "Woodie Flowers Award room",
     "Queuing/Field",
     "At Home",
+    "Quiet Room",
     "Custom",
   ];
 
@@ -40,6 +43,10 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
   String currRole = "";
   String loggedInUsername = "";
   bool userIsAdmin = false;
+  Future<List<dynamic>>? membersFuture;
+  Future<bool>? isAdminFuture;
+
+  Timer? refreshTimer;
 
   final TextEditingController locationController = TextEditingController();
   final TextEditingController jobController = TextEditingController();
@@ -58,6 +65,8 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
   }
 
   void loadData() async {
+    membersFuture = getMembers();
+    isAdminFuture = isAdmin();
     final prefs = await SharedPreferences.getInstance();
     userIsAdmin = await isAdmin();
 
@@ -73,9 +82,34 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
   }
 
   @override
+  void dispose() {
+    locationController.dispose();
+    jobController.dispose();
+    roleController.dispose();
+    customJobController.dispose();
+    customLocationController.dispose();
+    newPinController.dispose();
+    refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     loadData();
+
+    refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        silentRefresh();
+      }
+    });
+  }
+
+  Future<void> silentRefresh() async {
+    setState(() {
+      membersFuture = getMembers();
+      isAdminFuture = isAdmin();
+    });
   }
 
   Future<bool?> showEditDialog(
@@ -179,8 +213,7 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     return RefreshIndicator(
       onRefresh: () async {
-        loadData();
-        setState(() {});
+        silentRefresh();
         await Future.delayed(const Duration(milliseconds: 500));
       },
       child: ListView(
@@ -223,7 +256,7 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
                                           await prefs.setString("location", customLocationController.text);
                                           await setStatus();
                                           locationController.text = customLocationController.text;
-                                          if (mounted) Navigator.pop(context);
+                                          Navigator.pop(context);
                                         } catch (e) {
                                           scaffoldMessenger.showSnackBar(
                                             SnackBar(
@@ -296,7 +329,7 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
                                           await prefs.setString("job", customJobController.text);
                                           await setStatus();
                                           jobController.text = customJobController.text;
-                                          if (mounted) Navigator.pop(context);
+                                          Navigator.pop(context);
                                         } catch (e) {
                                           scaffoldMessenger.showSnackBar(
                                             SnackBar(
@@ -376,7 +409,7 @@ class _DesktopMembersViewState extends State<DesktopMembersView> {
               const SizedBox(height: 16),
 
               FutureBuilder(
-                future: Future.wait([getMembers(), isAdmin()]),
+                future: Future.wait<dynamic>([?membersFuture, ?isAdminFuture]),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text("Error fetching members"));

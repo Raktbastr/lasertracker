@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,10 +17,28 @@ class _MobileTeamViewState extends State<MobileTeamView> {
   String eventKey = "";
   String groupKey = "";
 
+  Future<Image>? avatarFuture;
+  Future<List<dynamic>>? matchesFuture;
+  Future<List<dynamic>>? membersFuture;
+
+  Timer? refreshTimer;
+
   @override
   void initState() {
     super.initState();
     loadData();
+
+    refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        silentRefresh();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    refreshTimer?.cancel();
+    super.dispose();
   }
 
   void loadData() async {
@@ -29,6 +49,23 @@ class _MobileTeamViewState extends State<MobileTeamView> {
       groupName = prefs.getString("group_name") ?? "";
       eventKey = prefs.getString("event_key") ?? "";
       groupKey = prefs.getString("loginGroupKey") ?? "";
+
+      if (teamNum.isNotEmpty) {
+        avatarFuture = getTeamAvatar(teamNum);
+        membersFuture = getMembers();
+        if (eventKey.isNotEmpty) {
+          matchesFuture = getMatches(teamNum, eventKey);
+        }
+      }
+    });
+  }
+
+  Future<void> silentRefresh() async {
+    if (teamNum.isEmpty) return;
+
+    setState(() {
+      membersFuture = getMembers();
+      matchesFuture = getMatches(teamNum, eventKey);
     });
   }
 
@@ -40,8 +77,7 @@ class _MobileTeamViewState extends State<MobileTeamView> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        loadData();
-        setState(() {});
+        silentRefresh();
         await Future.delayed(const Duration(milliseconds: 500));
       },
       child: ListView(
@@ -54,7 +90,7 @@ class _MobileTeamViewState extends State<MobileTeamView> {
               SizedBox(
                 height: 40,
                 child: FutureBuilder<Image>(
-                  future: getTeamAvatar(teamNum),
+                  future: avatarFuture,
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Center(child: Text("Error fetching team avatar"));
@@ -90,7 +126,7 @@ class _MobileTeamViewState extends State<MobileTeamView> {
           ),
           const SizedBox(height: 24),
           FutureBuilder(
-            future: getMembers(),
+            future: membersFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -151,7 +187,7 @@ class _MobileTeamViewState extends State<MobileTeamView> {
             },
           ),
           FutureBuilder(
-            future: getMatches(teamNum, eventKey),
+            future: matchesFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(

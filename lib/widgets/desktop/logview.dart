@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lasertracker/core/api.dart';
 
@@ -9,11 +11,38 @@ class DesktopLogView extends StatefulWidget {
 }
 
 class _DesktopLogViewState extends State<DesktopLogView> {
+  Future<List<dynamic>>? logsFuture;
+  Timer? refreshTimer;
+
+  @override
+  void dispose() {
+    refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    logsFuture = getLogs();
+
+    refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        silentRefresh();
+      }
+    });
+  }
+
+  Future<void> silentRefresh() async {
+    setState(() {
+      logsFuture = getLogs();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        setState(() {});
+        silentRefresh();
         await Future.delayed(const Duration(milliseconds: 500));
       },
       child: Column(
@@ -21,7 +50,7 @@ class _DesktopLogViewState extends State<DesktopLogView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FutureBuilder(
-            future: getLogs(),
+            future: logsFuture,
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(child: Text("Error fetching logs"));
